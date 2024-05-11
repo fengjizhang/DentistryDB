@@ -1,0 +1,306 @@
+CREATE TABLE Person (
+    PersonID INTEGER PRIMARY KEY,
+    FirstName TEXT NOT NULL,
+    LastName TEXT NOT NULL,
+    DateOfBirth DATE,
+    Phone TEXT,
+    EmergencyContext TEXT,
+    Email TEXT
+);
+
+CREATE TABLE PersonClinic (
+    ClinicID INTEGER,
+    PersonID INTEGER,
+    PRIMARY KEY (ClinicID, PersonID),
+    FOREIGN KEY (PersonID) REFERENCES Person(PersonID)
+);
+
+
+CREATE TABLE Patient (
+    PatientID INTEGER PRIMARY KEY,
+    InsuranceID TEXT,
+    HPAAFormSignedDate DATE
+);
+
+
+CREATE TABLE Clinic (
+    ClinicID INTEGER PRIMARY KEY,
+    Name TEXT NOT NULL,
+    Phone TEXT,
+    Email TEXT
+);
+
+
+CREATE TABLE Address (
+    AddressID INTEGER PRIMARY KEY,
+    Street TEXT NOT NULL,
+    State TEXT NOT NULL,
+    City TEXT NOT NULL,
+    Zip TEXT NOT NULL
+);
+
+
+CREATE TABLE CheckPayment (
+    CheckPaymentID INTEGER PRIMARY KEY,
+    RoutingNumber TEXT NOT NULL,
+    AccountName TEXT NOT NULL,
+    CheckNumber TEXT NOT NULL,
+    Bank TEXT NOT NULL
+);
+
+
+CREATE TABLE Cash (
+    CashPaymentID INTEGER PRIMARY KEY,
+    ReceiptNumber TEXT NOT NULL
+);
+
+
+CREATE TABLE Card (
+    CardPaymentID INTEGER PRIMARY KEY,
+    CVV TEXT NOT NULL,
+    CardType TEXT NOT NULL,
+    ExpiryDate DATE NOT NULL,
+    CardNumber TEXT NOT NULL
+);
+
+
+CREATE TABLE PatientHistory (
+    PatientID INTEGER,
+    HealthInfoID INTEGER,
+    UpdateDate DATE,
+    LastXRayDate DATE,
+    PRIMARY KEY (PatientID, HealthInfoID)
+);
+
+
+CREATE TABLE Payment (
+    PaymentID INTEGER PRIMARY KEY,
+    Date DATE NOT NULL,
+    Amount REAL NOT NULL
+);
+
+
+CREATE TABLE PaymentByInsurance (
+    PolicyID INTEGER,
+    PaymentID INTEGER,
+    PRIMARY KEY (PolicyID, PaymentID)
+);
+
+
+CREATE TABLE Invoice (
+    InvoiceNumber INTEGER,
+    PaymentID INTEGER,
+    Amount REAL NOT NULL,
+    PRIMARY KEY (InvoiceNumber, PaymentID)
+);
+
+
+CREATE TABLE BillInfo (
+    RecordID INTEGER PRIMARY KEY,
+    Date DATE NOT NULL,
+    TotalCharge REAL NOT NULL
+);
+
+
+CREATE TABLE PaymentBill (
+    RecordID INTEGER,
+    PaymentID INTEGER,
+    PRIMARY KEY (RecordID, PaymentID),
+    FOREIGN KEY (RecordID) REFERENCES BillInfo(RecordID),
+    FOREIGN KEY (PaymentID) REFERENCES Payment(PaymentID)
+);
+
+
+
+CREATE TABLE Appointment (
+    AppointmentID INTEGER PRIMARY KEY,
+    Date DATE NOT NULL,
+    Status TEXT NOT NULL,
+    Time TEXT NOT NULL
+);
+
+
+
+CREATE TABLE TreatmentInfo (
+    TreatmentID INTEGER PRIMARY KEY,
+    Cost REAL NOT NULL,
+    Name TEXT NOT NULL,
+    Description TEXT
+);
+
+
+
+CREATE TABLE Treatment (
+    AppointmentID INTEGER,
+    TreatmentID INTEGER,
+    PRIMARY KEY (AppointmentID, TreatmentID),
+    FOREIGN KEY (AppointmentID) REFERENCES Appointment(AppointmentID),
+    FOREIGN KEY (TreatmentID) REFERENCES TreatmentInfo(TreatmentID)
+);
+
+
+
+CREATE TABLE ProcedureInfo (
+    ProcedureID INTEGER PRIMARY KEY,
+    Name TEXT NOT NULL,
+    Type TEXT NOT NULL,
+    Description TEXT,
+    Charge REAL NOT NULL,
+    Provider TEXT NOT NULL
+);
+
+
+
+CREATE TABLE Procedure (
+    TreatmentID INTEGER,
+    ProcedureID INTEGER,
+    PRIMARY KEY (TreatmentID, ProcedureID),
+    FOREIGN KEY (TreatmentID) REFERENCES Treatment(TreatmentID),
+    FOREIGN KEY (ProcedureID) REFERENCES ProcedureInfo(ProcedureID)
+);
+
+
+
+CREATE TABLE ItemInfo (
+    ItemID INTEGER PRIMARY KEY,
+    Quantity INTEGER NOT NULL,
+    Name TEXT NOT NULL
+);
+
+
+
+CREATE TABLE InventoryItem (
+    ClinicID INTEGER,
+    ItemID INTEGER,
+    PRIMARY KEY (ClinicID, ItemID),
+    FOREIGN KEY (ClinicID) REFERENCES Clinic(ClinicID),
+    FOREIGN KEY (ItemID) REFERENCES ItemInfo(ItemID)
+);
+
+
+
+CREATE TABLE FeedbackInfo (
+    FeedbackID INTEGER PRIMARY KEY,
+    Recommendation TEXT,
+    Date DATE NOT NULL,
+    Comments TEXT
+);
+
+
+
+CREATE TABLE Feedback (
+    FeedbackID INTEGER,
+    PatientID INTEGER,
+    PRIMARY KEY (FeedbackID, PatientID),
+    FOREIGN KEY (FeedbackID) REFERENCES FeedbackInfo(FeedbackID),
+    FOREIGN KEY (PatientID) REFERENCES Patient(PatientID)
+);
+
+
+
+CREATE TABLE Allergy (
+    HealthInfoID INTEGER PRIMARY KEY,
+    Type TEXT NOT NULL,
+    Symptoms TEXT
+);
+
+
+CREATE TABLE Medication (
+    HealthInfoID INTEGER PRIMARY KEY,
+    Medicine_name TEXT NOT NULL,
+    StartDate DATE NOT NULL,
+    EndDate DATE NOT NULL
+);
+
+
+CREATE TABLE PrescriptionInfo (
+    PrescriptionID INTEGER PRIMARY KEY,
+    Duration TEXT NOT NULL,
+    DrugName TEXT NOT NULL,
+    IssueDate DATE NOT NULL,
+    Dosage TEXT NOT NULL
+);
+
+
+
+CREATE TABLE Prescription (
+    TreatmentID INTEGER,
+    PrescriptionID INTEGER,
+    PRIMARY KEY (TreatmentID, PrescriptionID),
+    FOREIGN KEY (TreatmentID) REFERENCES Treatment(TreatmentID),
+    FOREIGN KEY (PrescriptionID) REFERENCES PrescriptionInfo(PrescriptionID)
+);
+
+
+
+CREATE TABLE InsurancePlan (
+    PolicyID INTEGER PRIMARY KEY,
+    Provider TEXT NOT NULL,
+    CoverageDetails TEXT NOT NULL,
+    PolicyType TEXT NOT NULL
+);
+
+
+
+CREATE TABLE InsuredPatient (
+    PatientID INTEGER,
+    PolicyID INTEGER,
+    PRIMARY KEY (PatientID, PolicyID),
+    FOREIGN KEY (PatientID) REFERENCES Patient(PatientID),
+    FOREIGN KEY (PolicyID) REFERENCES InsurancePlan(PolicyID)
+);
+
+
+
+CREATE TABLE AppointmentEmployeeFeedback (
+    PatientID INTEGER,
+    AppointmentID INTEGER,
+    EmployeeID INTEGER,
+    FeedbackID INTEGER,
+    PRIMARY KEY (AppointmentID, PatientID),
+    FOREIGN KEY (AppointmentID) REFERENCES Appointment(AppointmentID),
+    FOREIGN KEY (PatientID) REFERENCES Patient(PatientID),
+    FOREIGN KEY (EmployeeID) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (FeedbackID) REFERENCES Feedback(FeedbackID)
+);
+
+
+
+CREATE TABLE PersonAddress (
+    PersonID INTEGER,
+    AddressID INTEGER,
+    PRIMARY KEY (PersonID, AddressID),
+    FOREIGN KEY (PersonID) REFERENCES Person(PersonID),
+    FOREIGN KEY (AddressID) REFERENCES Address(AddressID)
+);
+
+
+CREATE TABLE Involves (
+    TreatmentID INTEGER,
+    RecordID INTEGER,
+    PRIMARY KEY (TreatmentID, RecordID),
+    FOREIGN KEY (TreatmentID) REFERENCES Treatment(TreatmentID),
+    FOREIGN KEY (RecordID) REFERENCES BillInfo(RecordID)
+);
+
+
+
+CREATE TABLE ProvideService (
+    AppointmentID INTEGER,
+    EmployeeID INTEGER,
+    PRIMARY KEY (AppointmentID, EmployeeID),
+    FOREIGN KEY (AppointmentID) REFERENCES Appointment(AppointmentID),
+    FOREIGN KEY (EmployeeID) REFERENCES Employee(EmployeeID)
+);
+
+
+
+CREATE TABLE InsuredBy (
+    PolicyID INTEGER,
+    PatientID INTEGER,
+    PRIMARY KEY (PolicyID, PatientID),
+    FOREIGN KEY (PolicyID) REFERENCES InsurancePlan(PolicyID),
+    FOREIGN KEY (PatientID) REFERENCES Patient(PatientID)
+);
+
+
